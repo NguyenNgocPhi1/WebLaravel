@@ -14,3 +14,6 @@
     </div><!-- .attribute -->
     @endforeach
 @endif
+
+<input type="hidden" name="product_id" value="{{ $product->id }}">
+<input type="hidden" name="language_id" value="{{ $config['language'] }}">

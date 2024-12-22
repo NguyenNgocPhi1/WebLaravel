@@ -5,14 +5,20 @@ namespace App\Http\Controllers\Ajax;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Repositories\Interfaces\ProductRepositoryInterface as ProductRepository;
+use App\Repositories\Interfaces\ProductVariantRepositoryInterface as ProductVariantRepository;
 use App\Models\Language;
 
 class ProductController extends Controller
 {
     protected $productRepository;
+    protected $productVariantRepository;
     protected $language;
-    public function __construct(ProductRepository $productRepository){
+    public function __construct(
+        ProductRepository $productRepository,
+        ProductVariantRepository $productVariantRepository,
+    ){
         $this->productRepository = $productRepository;
+        $this->productVariantRepository = $productVariantRepository;
         $this->middleware(function($request, $next){
             $locale = app()->getLocale();
             $language = Language::where('canonical', $locale)->first();
@@ -56,6 +62,15 @@ class ProductController extends Controller
             'model' => ($get['model']) ?? 'Product',
             'objects' => $objects
         ]);    
+    }
+
+    public function loadVariant(Request $request){
+        $get = $request->input();
+        $attributeId = $get['attribute_id'];
+        sort($attributeId, SORT_NUMERIC);
+        $attributeId = implode(',', $attributeId);
+        $variant = $this->productVariantRepository->findVariant($attributeId, $get['product_id'], $get['language_id']);
+        dd($variant);
     }
 
 }

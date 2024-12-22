@@ -291,8 +291,45 @@
 				_this.parents('.attribute-item').find('span').html(attribute_name)
 				_this.parents('.attribute-value').find('.choose-attribute').removeClass('active')
 				_this.addClass('active')
+				HT.handleAttribute()
 			})
 		}
+	}
+
+	HT.handleAttribute = () => {
+		let attribute_id = []
+		let flag = true
+		$('.attribute-value .choose-attribute').each(function(){
+			let _this = $(this)
+			if(_this.hasClass('active')){
+				attribute_id.push(_this.attr('data-attributeid'))
+			}
+		})
+		$('.attribute').each(function(){
+			if($(this).find('.choose-attribute.active').length === 0){
+				flag = false
+				return false;
+			}
+		})
+		if(flag){
+			$.ajax({
+				url: 'ajax/product/loadVariant', 
+				type: 'GET', 
+				data: {
+					'attribute_id' : attribute_id,
+					'product_id' : $('input[name=product_id]').val(),
+					'language_id' : $('input[name=language_id]').val(),
+				}, 
+				dataType: 'json', 
+				beforeSend: function() {
+					
+				},
+				success: function(res) {
+					console.log(res);
+				},
+			});
+		}
+		
 	}
 
 	$(document).ready(function(){

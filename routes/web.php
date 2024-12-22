@@ -285,6 +285,7 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
     Route::post('ajax/slide/order', [AjaxSlideController::class, 'order'])->name('ajax.slide.order');
     Route::get('ajax/source/getAllSource', [AjaxSourceController::class, 'getAllSource'])->name('ajax.source.getAllSource');
     Route::get('ajax/dashboard/getPromotionConditionValue', [AjaxDashboardController::class, 'getPromotionConditionValue'])->name('ajax.dashboard.getPromotionConditionValue');
+    Route::get('ajax/product/loadVariant', [AjaxProductController::class, 'loadVariant'])->name('ajax.product.loadVariant');
 });
 
 
