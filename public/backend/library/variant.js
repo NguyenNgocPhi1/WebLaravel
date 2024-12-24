@@ -92,62 +92,78 @@
         let variants = []
         let attributeTitle = []
 
-        $('.variant-item').each(function(){
-            let _this = $(this)
-            let attr = []
-            let attrVariant = []
-            const attributeCatalogueId = _this.find('.choose-attribute').val()
-            const optionText = _this.find('.choose-attribute option:selected').text()
-            const attribute = $('.variant-'+attributeCatalogueId).select2('data')
-            for(let i = 0; i < attribute.length; i++){
-                let item = {}
-                let itemVariant = {}
-                item[optionText] = attribute[i].text
-                itemVariant[attributeCatalogueId] = attribute[i].id
-                attr.push(item)
-                attrVariant.push(itemVariant)
-            }
-            attributeTitle.push(optionText)
-            attributes.push(attr)
-            variants.push(attrVariant)
-        })
-        attributes = attributes.reduce(
-            (a, b) => a.flatMap( d => b.map( e => ( {...d, ...e} ) ) )
-        )
-        variants = variants.reduce(
-            (a, b) => a.flatMap( d => b.map( e => ( {...d, ...e} ) ) )
-        )
 
-        HT.createTableHeader(attributeTitle)
-        let trClass = []
-        attributes.forEach((item, index) => {
-            let $row = HT.createVariantRow(item, variants[index])
-            let classModified = 'tr-variant-' + Object.values(variants[index]).join(', ').replace(/, /g, '-')
-            trClass.push(classModified)
-            if(!$('table.variantTable tbody tr').hasClass(classModified)){
-                $('table.variantTable tbody').append($row)
-            }
-        })
-
-        $('table.variantTable tbody tr').each(function(){
-            const $row = $(this)
-            const rowClasses = $row.attr('class')
-            if(rowClasses){
-                const rowClassesArray = rowClasses.split(' ')
-                let shouldRemove = false
-                rowClassesArray.forEach(rowClass => {
-                    if(rowClass == 'variant-row'){
-                        return
-                    }else if(!trClass.includes(rowClass)){
-                        shouldRemove = true
-                    }
-
-                })
-                if(shouldRemove){
-                    $row.remove()
+        if($('.variant-item').length ){
+            $('.variant-item').each(function(){
+                let _this = $(this)
+                let attr = []
+                let attrVariant = []
+                let attributeCatalogueId = _this.find('.choose-attribute').val()
+                let optionText = _this.find('.choose-attribute option:selected').text()
+                let attribute = $('.variant-'+attributeCatalogueId).select2('data')
+    
+    
+                for(let i = 0; i < attribute.length; i++){
+                    let item = {}
+                    let itemVariant = {}
+                    item[optionText] = attribute[i].text
+                    itemVariant[attributeCatalogueId] = attribute[i].id
+                    attr.push(item)
+                    attrVariant.push(itemVariant)
                 }
-            }
-        })
+                attributeTitle.push(optionText)
+                attributes.push(attr)
+                variants.push(attrVariant)
+    
+            })
+    
+            // console.log(attributes);
+    
+            attributes = attributes.reduce(
+                (a, b) => a.flatMap( d => b.map( e => ( {...d, ...e} ) ) )
+            )
+    
+            variants = variants.reduce(
+                (a, b) => a.flatMap( d => b.map( e => ( {...d, ...e} ) ) )
+            )
+    
+            HT.createTableHeader(attributeTitle)
+    
+            let trClass = []
+            attributes.forEach((item, index) => {
+                let $row = HT.createVariantRow(item, variants[index])
+                let classModified = 'tr-variant-' + Object.values(variants[index]).join(', ').replace(/, /g, '-')
+                trClass.push(classModified)
+    
+                if(!$('table.variantTable tbody tr').hasClass(classModified)){
+                    $('table.variantTable tbody').append($row)
+                }
+            });
+    
+    
+            $('table.variantTable tbody tr').each(function(){
+                const $row = $(this)
+                const rowClasses = $row.attr('class')
+                if(rowClasses){
+                    const rowClassArray = rowClasses.split(' ')
+                    let shouldRemove = false
+                    rowClassArray.forEach(rowClass => {
+                        if(rowClass == 'variant-row'){
+                            return;
+                        }else if(!trClass.includes(rowClass)){
+                            shouldRemove = true
+                        }
+                    })
+                    if(shouldRemove){
+                        $row.remove()
+                    }
+    
+                }
+            })
+        }else{
+
+            $('.product-variant .ibox-content').html('')
+        }
     }
 
     HT.createVariantRow = (attributeItem, variantItem) => {
@@ -180,6 +196,9 @@
             { name: 'productVariant[name][]', value: attributeString},
             { name: 'productVariant[id][]', value: attributeId},
         ]
+
+        
+
         $.each(inputHiddenFields, function(_, field){
             let $input = $('<input>').attr('type', 'text').attr('name', field.name).addClass(field.class)
             if(field.value){
@@ -357,6 +376,7 @@
             if($('.updateVariantTr').length == 0){
                 _this.after(updateVariantBox)
                 HT.switchery()
+                HT.sortui2()
             }
         })
     }
@@ -527,56 +547,71 @@
         return str;
     }
 
-    HT.setupSelectMultiple = (callback) => {
-        if($('.selectVariant').length){
-            let count = $('.selectVariant').length
-            $('.selectVariant').each(function(){
-                let _this = $(this)
-                let attributeCatalogueId = _this.attr('data-catid')
-                if(attribute != ''){
-                    $.get('ajax/attribute/loadAttribute', {
-                        attribute : attribute,
-                        attributeCatalogueId : attributeCatalogueId
-                    }, function(json){
-                        if(json.items != 'undefined' && json.items.length){
-                            for(let i = 0; i < json.items.length; i++){
-                                var option = new Option(json.items[i].text, json.items[i].id, true, true)
-                                _this.append(option).trigger('change')
+    HT.setupSelectMultiple = () => {
+        return new Promise((resolve) => {
+            if ($('.selectVariant').length) {
+                let count = $('.selectVariant').length;
+    
+                $('.selectVariant').each(function () {
+                    let _this = $(this);
+                    let attributeCatalogueId = _this.attr('data-catid');
+    
+                    if (attributeCatalogueId !== '') {
+                        $.get('ajax/attribute/loadAttribute', {
+                            attribute: attribute,
+                            attributeCatalogueId: attributeCatalogueId
+                        }, function (json) {
+                            if (json.items !== 'undefined' && json.items.length) {
+                                for (let i = 0; i < json.items.length; i++) {
+                                    var option = new Option(json.items[i].text, json.items[i].id, true, true);
+                                    _this.append(option).trigger('change');
+                                }
                             }
-                        }
-                        if(--count === 0 && callback){
-                            callback()
-                        }
-                    })
-                }
-                HT.getSelect2(_this)
-            })
-        }
-    }
+                            if (--count === 0) {
+                                resolve();
+                            }
+                        });
+                    }
+                    HT.getSelect2(_this);
+                });
+            } else {
+                resolve();
+            }
+        });
+    };
 
     HT.productVariant = () => {
         variant = JSON.parse(atob(variant))
         $('.variant-row').each(function(index, data){
             let _this = $(this)
-            let inputHiddenFields = [
-                { name: 'variant[quantity][]', class: 'variant_quantity', value: variant.quantity[index]},
-                { name: 'variant[sku][]', class: 'variant_sku', value: variant.sku[index]},
-                { name: 'variant[price][]', class: 'variant_price', value: variant.price[index]},
-                { name: 'variant[barcode][]', class: 'variant_barcode', value: variant.barcode[index]},
-                { name: 'variant[file_name][]', class: 'variant_filename', value: variant.file_name[index]},
-                { name: 'variant[file_url][]', class: 'variant_fileurl', value: variant.file_url[index]},
-                { name: 'variant[album][]', class: 'variant_album', value: variant.album[index]},
-            ]
-            for(let i = 0; i < inputHiddenFields.length; i++){
-                _this.find('.' + inputHiddenFields[i].class).val((inputHiddenFields[i].value) ? inputHiddenFields[i].value : 0)
+            let variantKey = Array.from(_this[0].classList).find(cls => cls.trim().startsWith('tr-variant-')).split('variant-')[1].trim();
+            let dataIndex = variant.sku.findIndex(sku => sku.includes(variantKey));
+            if(dataIndex !== -1){
+                let inputHiddenFields = [
+                    { name: 'variant[quantity][]', class: 'variant_quantity', value: variant.quantity[dataIndex]},
+                    { name: 'variant[sku][]', class: 'variant_sku', value: variant.sku[dataIndex]},
+                    { name: 'variant[price][]', class: 'variant_price', value: variant.price[dataIndex]},
+                    { name: 'variant[barcode][]', class: 'variant_barcode', value: variant.barcode[dataIndex]},
+                    { name: 'variant[file_name][]', class: 'variant_filename', value: variant.file_name[dataIndex]},
+                    { name: 'variant[file_url][]', class: 'variant_fileurl', value: variant.file_url[dataIndex]},
+                    { name: 'variant[album][]', class: 'variant_album', value: variant.album[dataIndex]},
+                ]
+                for(let i = 0; i < inputHiddenFields.length; i++){
+                    _this.find('.' + inputHiddenFields[i].class).val((inputHiddenFields[i].value) ? inputHiddenFields[i].value : 0)
+                }
+                let album = variant.album[dataIndex]
+                let variantImage = (album) ? album.split(',')[0] : 'https://images.spiderum.com/sp-images/b999ab407d6811ed8117892817d55697.jpeg'
+                _this.find('.td-quantity').html(HT.addCommas(variant.quantity[dataIndex]))
+                _this.find('.td-price').html(HT.addCommas(variant.price[dataIndex]))
+                _this.find('.td-sku').html(variant.sku[dataIndex])
+                _this.find('.imageSrc').attr('src',variantImage)
             }
-            let album = variant.album[index]
-            let variantImage = (album) ? album.split(',')[0] : 'https://images.spiderum.com/sp-images/b999ab407d6811ed8117892817d55697.jpeg'
-            _this.find('.td-quantity').html(HT.addCommas(variant.quantity[index]))
-            _this.find('.td-price').html(HT.addCommas(variant.price[index]))
-            _this.find('.td-sku').html(variant.sku[index])
-            _this.find('.imageSrc').attr('src',variantImage)
         })
+    }
+
+    HT.sortui2 = () => {
+        $( "#sortable2" ).sortable();
+		$( "#sortable2" ).disableSelection();
     }
 
     $(document).ready(function () {
@@ -592,10 +627,8 @@
         HT.updateVariant()
         HT.cancleVariantUpdate()
         HT.saveVariantUpdate()
-        HT.setupSelectMultiple(
-            () => {
-                HT.productVariant()
-            }
-        )
+        HT.setupSelectMultiple().then(() => {
+            HT.productVariant();
+        });
     })
 })(jQuery)

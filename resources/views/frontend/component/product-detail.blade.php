@@ -38,7 +38,7 @@
                 </div>
                 <div class="uk-width-large-1-2">
                     <div class="popup-product">
-                        <h1 class="title"><span>{{ $name }}</span>
+                        <h1 class="title product-main-title"><span>{{ $name }}</span>
                         </h1>
                         <div class="rating">
                             <div class="uk-flex uk-flex-middle">
@@ -115,3 +115,5 @@
         </div>
     </div>
 </div>
+
+<input type="hidden" class="productName" value="{{ $product->name }}">

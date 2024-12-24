@@ -261,24 +261,27 @@
 	}
 	
 	HT.popupSwiperSlide = () => {
-		var swiper = new Swiper(".popup-gallery .swiper-container", {
-			loop: true,
-			autoplay: {
-				delay: 2000,
-				disableOnInteraction: false,
-			},
-			pagination: {
-				el: '.swiper-pagination',
-			},
-			thumbs: {
-				swiper: {
-					el: '.swiper-container-thumbs',
-					slidesPerView: 4,
-					spaceBetween: 10,
-					slideToClickedSlide: true,
+		document.querySelectorAll(".popup-gallery").forEach(popup => {
+			var swiper = new Swiper(popup.querySelector(".swiper-container"), {
+				loop: true,
+				autoplay: {
+					delay: 2000,
+					disableOnInteraction: false,
 				},
-			}			
-		});
+				pagination: {
+					el: '.swiper-pagination',
+				},
+				thumbs: {
+					swiper: {
+						el: popup.querySelector('.swiper-container-thumbs'),
+						slidesPerView: 4,
+						spaceBetween: 10,
+						slideToClickedSlide: true,
+					},
+				}			
+			});
+		})
+		
 	}
 
 	HT.selectVariantProduct = () => {
@@ -325,9 +328,55 @@
 					
 				},
 				success: function(res) {
-					console.log(res);
+					HT.setupVariantGallery(res)
+					HT.setupVariantName(res)
+
 				},
 			});
+		}
+		
+	}
+
+	HT.setupVariantName  = (res) => {
+		let productName = $('.productName').val()
+		let productVariantName = productName + ' ' + res.variant.languages[0].pivot.name
+		$('.product-main-title span').html(productVariantName)
+	}
+
+	HT.setupVariantGallery = (gallery) => {
+		let album = gallery.variant.album.split(',')
+		let html = `
+			<div class="swiper-container">
+				<div class="swiper-wrapper big-pic">
+		`
+		album.forEach((val) => {
+			html += `
+				<div class="swiper-slide" data-swiper-autoplay="2000">
+					<a href="${val}" class="image img-cover"><img src="${val}" alt="${val}"></a>
+				</div>
+			`
+		})
+		html += `
+			</div>
+				<div class="swiper-pagination"></div>
+			</div>
+			<div class="swiper-container-thumbs">
+				<div class="swiper-wrapper pic-list">
+		`
+		album.forEach((val) => {
+			html += `
+				<div class="swiper-slide">
+					<span  class="image img-cover"><img src="${val}" alt="${val}"></span>
+				</div>
+			`
+		})
+		html += `
+				</div>
+			</div>
+		`
+		if(album.length){
+			$('.popup-gallery').html(html)
+			HT.popupSwiperSlide()
 		}
 		
 	}

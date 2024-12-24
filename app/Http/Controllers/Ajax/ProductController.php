@@ -70,7 +70,10 @@ class ProductController extends Controller
         sort($attributeId, SORT_NUMERIC);
         $attributeId = implode(',', $attributeId);
         $variant = $this->productVariantRepository->findVariant($attributeId, $get['product_id'], $get['language_id']);
-        dd($variant);
+        $variantPromotion = $this->promotionRepository->findPromotionByVariantUuid($variant->uuid);
+        return response()->json([
+            'variant' => $variant
+        ]);
     }
 
 }

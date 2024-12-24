@@ -309,7 +309,7 @@ class ProductService extends BaseService implements ProductServiceInterface
         $promotions = $this->promotionRepository->findPromotionByProduct($productId);
         if($promotions){
             if($flag == true){
-                $products->promotions = $promotions[0];
+                $products->promotions = ($promotions[0]) ?? [];
                 return $products;
             }
             foreach ($products as $index => $product) {

@@ -50,6 +50,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::get('{canonical}'.config('apps.general.suffix'), [RouterController::class, 'index'])->name('router.index')->where('canonical', '[a-zA-Z0-9-]+');
 Route::get('{canonical}/trang-{page}'.config('apps.general.suffix'), [RouterController::class, 'page'])->name('router.page')->where('canonical', '[a-zA-Z0-9-]+')->where('page', '[0-9]+');
 
+// FRONTEND AJAX ROUTE
+Route::get('ajax/product/loadVariant', [AjaxProductController::class, 'loadVariant'])->name('ajax.product.loadVariant');
+
+
 Route::group(['middleware' => ['admin','locale','backend_default_locale']], function (){
     // BACKEND ROUTES
     Route::get('dashboard/index', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -285,7 +289,6 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
     Route::post('ajax/slide/order', [AjaxSlideController::class, 'order'])->name('ajax.slide.order');
     Route::get('ajax/source/getAllSource', [AjaxSourceController::class, 'getAllSource'])->name('ajax.source.getAllSource');
     Route::get('ajax/dashboard/getPromotionConditionValue', [AjaxDashboardController::class, 'getPromotionConditionValue'])->name('ajax.dashboard.getPromotionConditionValue');
-    Route::get('ajax/product/loadVariant', [AjaxProductController::class, 'loadVariant'])->name('ajax.product.loadVariant');
 });
 
 
