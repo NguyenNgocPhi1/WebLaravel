@@ -68,18 +68,18 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
         ->selectRaw(
             "
                 MAX(
-                        IF(promotions.maxDiscountValue != 0, 
+                    IF(promotions.maxDiscountValue != 0, 
                         LEAST(
                             CASE
                                 WHEN discountType = 'cash' THEN discountValue
-                                WHEN discountType = 'percent' THEN (products.price * discountValue / 100)
+                                WHEN discountType = 'percent' THEN pv.price * discountValue / 100
                                 ELSE 0
                             END,
                             promotions.maxDiscountValue
                         ),
                         CASE
                             WHEN discountType = 'cash' THEN discountValue
-                            WHEN discountType = 'percent' THEN (products.price * discountValue / 100)
+                            WHEN discountType = 'percent' THEN pv.price * discountValue / 100
                             ELSE 0
                         END
                     )
@@ -87,13 +87,13 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
             "
         )
         ->join('promotion_product_variant as ppv', 'ppv.promotion_id', '=', 'promotions.id')
-        ->join('products', 'products.id', '=', 'ppv.product_id')
-        ->where('products.publish', 2)
+        ->join('product_variants as pv', 'pv.uuid', '=', 'ppv.variant_uuid')
         ->where('promotions.publish', 2)
-        ->whereIn('products.id', $productId)
+        ->where('ppv.variant_uuid', $uuid)
         ->whereDate('promotions.endDate', '>', now())
-        ->groupBy(['products.id', 'promotions.discountValue', 'promotions.discountType', 'promotions.id', 'promotions.maxDiscountValue', 'products.price'])
-        ->get();
+        ->whereDate('promotions.startDate', '<', now())
+        ->groupBy('promotions.id', 'promotions.discountValue', 'promotions.discountType', 'promotions.maxDiscountValue')
+        ->first();
     }
     
 }

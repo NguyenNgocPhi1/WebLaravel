@@ -314,6 +314,7 @@
 				return false;
 			}
 		})
+		
 		if(flag){
 			$.ajax({
 				url: 'ajax/product/loadVariant', 
@@ -328,13 +329,27 @@
 					
 				},
 				success: function(res) {
+					HT.setupVariantPrice(res)
 					HT.setupVariantGallery(res)
 					HT.setupVariantName(res)
+					HT.setupVariantUrl(res, attribute_id)
 
 				},
 			});
 		}
 		
+	}
+
+	HT.setupVariantUrl = (res, attribute_id) => {
+		let queryString = '?attribute_id=' + attribute_id.join(',')
+		let productCanonical = $('.productCanonical').val()
+		productCanonical = productCanonical + queryString
+		let stateObject = { attribute_id: attribute_id}
+		history.pushState(stateObject, "Page Title", productCanonical)
+	}
+
+	HT.setupVariantPrice = (res) => {
+		$('.popup-product .price').html(res.variantPrice.html)
 	}
 
 	HT.setupVariantName  = (res) => {
@@ -381,6 +396,13 @@
 		
 	}
 
+	HT.loadProductVariant = () => {
+		let attributeCatalogue = JSON.parse($('.attributeCatalogue').val())
+		if(typeof attributeCatalogue != 'undefined' && attributeCatalogue.length){
+			HT.handleAttribute()
+		}
+	}
+
 	$(document).ready(function(){
 		HT.wow()
 		HT.swiperCategory()
@@ -399,6 +421,7 @@
 		HT.openPreviewVideo()
 		HT.popupSwiperSlide()
 		HT.selectVariantProduct()
+		HT.loadProductVariant()
 	});
 
 })(jQuery);

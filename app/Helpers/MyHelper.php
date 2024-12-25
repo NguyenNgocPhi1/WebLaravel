@@ -115,6 +115,7 @@ if(!function_exists('getVariantPrice')){
             'html' => ''
         ];
 
+
         if($variant->price == 0){
 
             $result['html'] .= '<div class="price mt10">';
@@ -130,8 +131,9 @@ if(!function_exists('getVariantPrice')){
 
 
         $result['html'] .= '<div class="price-sale">'.(($result['priceSale'] > 0) ? convert_price($result['priceSale'], true) : convert_price($result['price'], true) ).'đ</div>';
-        if($result['priceSale'] !== $result['price']){
-            $result['html'] .= '<div class="price-old">'.convert_price($result['price'], true).'đ <div class="percent"><div class="percent-value">-'.$result['percent'].'%</div></div></div>';
+        if(!is_null($variantPromotion)){
+            $result['html'] .= '<div class="price-old">'.convert_price($result['price'], true).'đ</div>';
+            // <div class="percent"><div class="percent-value">-'.$result['percent'].'%</div></div>
         }
         return $result;
     }
