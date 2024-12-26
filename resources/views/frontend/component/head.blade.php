@@ -4,6 +4,7 @@
 <meta name="robots" content="index,follow"/>
 <meta name="author" content="{{ $system['homepage_company'] }}"/>
 <meta name="copyright" content="{{ $system['homepage_company'] }}" />
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <meta http-equiv="refresh" content="1800" />
 <link rel="icon" href="{{ $system['homepage_favicon'] }}" type="image/png" sizes="30x30">
 <!-- GOOGLE -->
@@ -29,6 +30,7 @@
 
 @php
     $coreCss = [
+        'backend/css/plugins/toastr/toastr.min.css',
         'frontend/resources/fonts/font-awesome-4.7.0/css/font-awesome.min.css',
         'frontend/resources/uikit/css/uikit.modify.css',
         'frontend/resources/library/css/library.css',

@@ -324,22 +324,26 @@ class ProductService extends BaseService implements ProductServiceInterface
     }
 
     public function getAttribute($product, $language){
-        $attributeCatalogueID = array_keys($product->attribute);
-        $attrCatalogues = $this->attributeCatalogueRepository->getAttributeCatalogueWhereIn($attributeCatalogueID, 'attribute_catalogues.id', $language);
-        $attributeId = array_merge(...$product->attribute);
-        $attrs = $this->attributeRepository->findAttributeByIdArray($attributeId, $language);
-        if(!is_null($attrCatalogues)){
-            foreach($attrCatalogues as $key => $val){
-                $tempAttributes = [];
-                foreach($attrs as $attr){
-                    if($val->id == $attr->attribute_catalogue_id){
-                        $tempAttributes[] = $attr;
+        $product->attributeCatalogue = [];
+        if(isset($product->attribute) && !is_null($product->attribute)){
+            $attributeCatalogueId = array_keys($product->attribute);
+            $attrCatalogues = $this->attributeCatalogueRepository->getAttributeCatalogueWhereIn($attributeCatalogueId, 'attribute_catalogues.id', $language);
+            /* ---- */
+            $attributeId = array_merge(...$product->attribute);
+            $attrs = $this->attributeRepository->findAttributeByIdArray($attributeId, $language);
+            if(!is_null($attrCatalogues)){
+                foreach($attrCatalogues as $key => $val){
+                    $tempAttributes = [];
+                    foreach($attrs as $attr){
+                        if($val->id == $attr->attribute_catalogue_id){
+                            $tempAttributes[] = $attr;
+                        }
                     }
+                    $val->attributes = $tempAttributes;
                 }
-                $val->attributes = $tempAttributes;
             }
+            $product->attributeCatalogue = $attrCatalogues;
         }
-        $product->attributeCatalogue = $attrCatalogues;
         return $product;
     }
 

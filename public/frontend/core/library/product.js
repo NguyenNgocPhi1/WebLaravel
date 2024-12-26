@@ -131,7 +131,6 @@
 			album = JSON.parse($('input[name=product_gallery]').val())
 		}
 
-		console.log(album);
 
 		let html = `<div class="swiper-container">
 			<div class="swiper-button-next"></div>

@@ -226,6 +226,23 @@
 
 	}// arrow function
 
+	HT.changeQuantity = () => {
+		$(document).on('click', '.quantity-button', function(){
+			let _this = $(this)
+			let quantity = $('.quantity-text').val()
+			let newQuantity = 0
+			if(_this.hasClass('minus')){
+				newQuantity = quantity - 1
+			} else{
+				newQuantity = parseInt(quantity) + 1
+			}
+			if(newQuantity < 1){
+				newQuantity = 1
+			}
+			$('.quantity-text').val(newQuantity)
+		})
+	}
+
 	HT.niceSelect = () => {
 		if($('.nice-select').length){
 			$('.nice-select').niceSelect();
@@ -314,7 +331,6 @@
 				return false;
 			}
 		})
-		
 		if(flag){
 			$.ajax({
 				url: 'ajax/product/loadVariant', 
@@ -389,11 +405,8 @@
 				</div>
 			</div>
 		`
-		if(album.length){
-			$('.popup-gallery').html(html)
-			HT.popupSwiperSlide()
-		}
-		
+		$('.popup-gallery').html(html)
+		HT.popupSwiperSlide()
 	}
 
 	HT.loadProductVariant = () => {
@@ -402,6 +415,7 @@
 			HT.handleAttribute()
 		}
 	}
+
 
 	$(document).ready(function(){
 		HT.wow()
@@ -422,6 +436,7 @@
 		HT.popupSwiperSlide()
 		HT.selectVariantProduct()
 		HT.loadProductVariant()
+		HT.changeQuantity()
 	});
 
 })(jQuery);

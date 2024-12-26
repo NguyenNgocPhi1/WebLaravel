@@ -169,6 +169,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\LanguageComposerServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
+        Gloudemans\Shoppingcart\ShoppingcartServiceProvider::class //gg(shopingCartLaravel 10) link https://github.com/mindscms/laravelshoppingcart
     ])->toArray(),
 
     /*
@@ -184,6 +185,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
+        'Cart' => Gloudemans\Shoppingcart\Facades\Cart::class, //gg(shopingCartLaravel 10) link https://github.com/mindscms/laravelshoppingcart
     ])->toArray(),
 
 ];
